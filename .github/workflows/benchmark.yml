@@ -143,9 +143,9 @@ jobs:
       - name: stats
         run: |
           VERSION=$(make pdm-version)
-          CSV=pdm_582/stats.csv
+          CSV=pdm-582/stats.csv
           TIMESTAMP=$(date +%s)
-          mkdir -p "pdm_582"
+          mkdir -p "pdm-582"
           echo "tool,version,timestamp,stat,elapsed time,system,user,cpu percent,max rss,inputs,outputs" > "$CSV"
           for stat in "tooling" "import" "lock" "install-cold" "install-warm" "update" "add-package"; do
             echo "pdm,$VERSION,$TIMESTAMP,$stat,$(cat timings/$stat.txt | tr -d '%')" >> "$CSV"
@@ -156,7 +156,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         with:
           name: pdm-582-stats
-          path: pdm_582/stats.csv
+          path: pdm-582/stats.csv
           retention-days: 10
 
   pdm-venv:
@@ -217,9 +217,9 @@ jobs:
       - name: stats
         run: |
           VERSION=$(make pdm-version)
-          CSV=pdm_venv/stats.csv
+          CSV=pdm-venv/stats.csv
           TIMESTAMP=$(date +%s)
-          mkdir -p "pdm_venv"
+          mkdir -p "pdm-venv"
           echo "tool,version,timestamp,stat,elapsed time,system,user,cpu percent,max rss,inputs,outputs" > "$CSV"
           for stat in "tooling" "import" "lock" "install-cold" "install-warm" "update" "add-package"; do
             echo "pdm,$VERSION,$TIMESTAMP,$stat,$(cat timings/$stat.txt | tr -d '%')" >> "$CSV"
@@ -230,7 +230,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         with:
           name: pdm-venv-stats
-          path: pdm_venv/stats.csv
+          path: pdm-venv/stats.csv
           retention-days: 10
   
   pipenv:
@@ -383,7 +383,7 @@ jobs:
 
   gather:
     runs-on: ubuntu-latest
-    needs: [poetry, pdm, pipenv, pip-tools]
+    needs: [poetry, pdm-582, pdm-venv, pipenv, pip-tools]
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/download-artifact@v3
