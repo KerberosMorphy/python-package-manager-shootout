@@ -42,30 +42,52 @@ poetry-add-package:
 poetry-version:
 	@poetry --version | awk '{print $$3}' | tr -d ')'
 
-TOOLS := "$(TOOLS) pdm"
-.PHONY: pdm-tooling pdm-import pdm-clean-cache pdm-clean-venv pdm-clean-lock pdm-lock pdm-install pdm-add-package pdm-version
-pdm-tooling:
+TOOLS := "$(TOOLS) pdm-582"
+.PHONY: pdm-582-tooling pdm-582-import pdm-582-clean-cache pdm-582-clean-venv pdm-582-clean-lock pdm-582-lock pdm-582-install pdm-582-add-package pdm-582-version
+pdm-582-tooling:
 	curl -sSL https://raw.githubusercontent.com/pdm-project/pdm/main/install-pdm.py | python3 -
-pdm-import:
+pdm-582-import:
 	cd pdm; pdm import -f requirements ../requirements.txt
-pdm-clean-cache: pip-clean
+pdm-582-clean-cache: pip-clean
 	rm -rf ~/.cache/pdm
-pdm-clean-venv:
+pdm-582-clean-venv:
 	rm -rf pdm/__pypackages__
 	mkdir -p pdm/__pypackages__
-pdm-clean-lock:
+pdm-582-clean-lock:
 	rm -f pdm/pdm.lock
-pdm-lock:
+pdm-582-lock:
 	cd pdm; pdm lock
-pdm-install:
+pdm-582-install:
 	cd pdm; pdm install
-pdm-update:
+pdm-582-update:
 	cd pdm; pdm update
-pdm-add-package:
+pdm-582-add-package:
 	cd pdm; pdm add $(PACKAGE)
-pdm-version:
+pdm-582-version:
 	@pdm --version | awk '{print $$3}'
 
+TOOLS := "$(TOOLS) pdm-venv"
+.PHONY: pdm-venv-tooling pdm-venv-import pdm-venv-clean-cache pdm-venv-clean-venv pdm-venv-clean-lock pdm-venv-lock pdm-venv-install pdm-venv-add-package pdm-venv-version
+pdm-venv-tooling:
+	curl -sSL https://raw.githubusercontent.com/pdm-project/pdm/main/install-pdm.py | python3 -
+pdm-venv-import:
+	cd pdm; pdm import -f requirements ../requirements.txt
+pdm-venv-clean-cache: pip-clean
+	rm -rf ~/.cache/pdm
+pdm-venv-clean-venv:
+	rm -rf pdm/__pypackages__
+pdm-venv-clean-lock:
+	rm -f pdm/pdm.lock
+pdm-venv-lock:
+	cd pdm; pdm lock
+pdm-venv-install:
+	cd pdm; pdm install
+pdm-venv-update:
+	cd pdm; pdm update
+pdm-venv-add-package:
+	cd pdm; pdm add $(PACKAGE)
+pdm-venv-version:
+	@pdm --version | awk '{print $$3}'
 
 TOOLS := "$(TOOLS) pipenv"
 .PHONY: pipenv-tooling pipenv-import pipenv-clean-cache pipenv-clean-venv pipenv-clean-lock pipenv-lock pipenv-install pipenv-add-package pipenv-version
