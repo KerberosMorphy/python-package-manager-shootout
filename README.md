@@ -6,7 +6,8 @@ The list of packages comes from [Sentry's `requirements.txt file`](https://githu
 
 ## Package Managers
 
-* [`pdm`](https://pdm.fming.dev/latest/)
+* [`pdm`](https://pdm.fming.dev/latest/) using `pep-582`
+* [`pdm`](https://pdm.fming.dev/latest/) using `virtualenv`
 * [`pip-tools`](https://pip-tools.readthedocs.io/) + [`venv`](https://docs.python.org/3/library/venv.html)
 * [`pipenv`](https://pipenv.pypa.io/)
 * [`poetry`](https://python-poetry.org/)
