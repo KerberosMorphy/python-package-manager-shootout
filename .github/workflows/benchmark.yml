@@ -84,7 +84,7 @@ jobs:
           path: poetry/stats.csv
           retention-days: 10
 
-  pdm:
+  pdm-582:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
@@ -101,50 +101,50 @@ jobs:
       - name: tooling
         run: |
           /usr/bin/time --output=timings/tooling.txt --format="%e,%S,%U,%P,%M,%I,%O" \
-            make pdm-tooling
+            make pdm-582-tooling
 
       - name: import
         run: |
           /usr/bin/time --output=timings/import.txt --format="%e,%S,%U,%P,%M,%I,%O" \
-            make pdm-import
+            make pdm-582-import
 
       - name: lock
         run: |
-          make pdm-clean-cache
-          make pdm-clean-venv
-          make pdm-clean-lock
+          make pdm-582-clean-cache
+          make pdm-582-clean-venv
+          make pdm-582-clean-lock
           /usr/bin/time --output=timings/lock.txt --format="%e,%S,%U,%P,%M,%I,%O" \
-            make pdm-lock
+            make pdm-582-lock
 
       - name: install cold
         run: |
-         make pdm-clean-cache
-         make pdm-clean-venv
+         make pdm-582-clean-cache
+         make pdm-582-clean-venv
          /usr/bin/time --output=timings/install-cold.txt --format="%e,%S,%U,%P,%M,%I,%O" \
-           make pdm-install
+           make pdm-582-install
 
       - name: install warm
         run: |
-          make pdm-clean-venv
+          make pdm-582-clean-venv
           /usr/bin/time --output=timings/install-warm.txt --format="%e,%S,%U,%P,%M,%I,%O" \
-            make pdm-install
+            make pdm-582-install
 
       - name: update
         run: |
           /usr/bin/time --output=timings/update.txt --format="%e,%S,%U,%P,%M,%I,%O" \
-            make pdm-update
+            make pdm-582-update
 
       - name: add package
         run: |
           /usr/bin/time --output=timings/add-package.txt --format="%e,%S,%U,%P,%M,%I,%O" \
-            make pdm-add-package
+            make pdm-582-add-package
 
       - name: stats
         run: |
           VERSION=$(make pdm-version)
-          CSV=pdm/stats.csv
+          CSV=pdm_582/stats.csv
           TIMESTAMP=$(date +%s)
-          mkdir -p "pdm"
+          mkdir -p "pdm_582"
           echo "tool,version,timestamp,stat,elapsed time,system,user,cpu percent,max rss,inputs,outputs" > "$CSV"
           for stat in "tooling" "import" "lock" "install-cold" "install-warm" "update" "add-package"; do
             echo "pdm,$VERSION,$TIMESTAMP,$stat,$(cat timings/$stat.txt | tr -d '%')" >> "$CSV"
@@ -154,10 +154,84 @@ jobs:
       - uses: actions/upload-artifact@v3
         if: github.ref == 'refs/heads/main'
         with:
-          name: pdm-stats
-          path: pdm/stats.csv
+          name: pdm-582-stats
+          path: pdm_582/stats.csv
           retention-days: 10
 
+  pdm-venv:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+
+      - name: setup
+        run: ./bin/actions_prereqs.sh
+
+      - name: tooling
+        run: |
+          /usr/bin/time --output=timings/tooling.txt --format="%e,%S,%U,%P,%M,%I,%O" \
+            make pdm-venv-tooling
+
+      - name: import
+        run: |
+          /usr/bin/time --output=timings/import.txt --format="%e,%S,%U,%P,%M,%I,%O" \
+            make pdm-venv-import
+
+      - name: lock
+        run: |
+          make pdm-venv-clean-cache
+          make pdm-venv-clean-venv
+          make pdm-venv-clean-lock
+          /usr/bin/time --output=timings/lock.txt --format="%e,%S,%U,%P,%M,%I,%O" \
+            make pdm-venv-lock
+
+      - name: install cold
+        run: |
+         make pdm-venv-clean-cache
+         make pdm-venv-clean-venv
+         /usr/bin/time --output=timings/install-cold.txt --format="%e,%S,%U,%P,%M,%I,%O" \
+           make pdm-venv-install
+
+      - name: install warm
+        run: |
+          make pdm-venv-clean-venv
+          /usr/bin/time --output=timings/install-warm.txt --format="%e,%S,%U,%P,%M,%I,%O" \
+            make pdm-venv-install
+
+      - name: update
+        run: |
+          /usr/bin/time --output=timings/update.txt --format="%e,%S,%U,%P,%M,%I,%O" \
+            make pdm-venv-update
+
+      - name: add package
+        run: |
+          /usr/bin/time --output=timings/add-package.txt --format="%e,%S,%U,%P,%M,%I,%O" \
+            make pdm-venv-add-package
+
+      - name: stats
+        run: |
+          VERSION=$(make pdm-version)
+          CSV=pdm_venv/stats.csv
+          TIMESTAMP=$(date +%s)
+          mkdir -p "pdm_venv"
+          echo "tool,version,timestamp,stat,elapsed time,system,user,cpu percent,max rss,inputs,outputs" > "$CSV"
+          for stat in "tooling" "import" "lock" "install-cold" "install-warm" "update" "add-package"; do
+            echo "pdm,$VERSION,$TIMESTAMP,$stat,$(cat timings/$stat.txt | tr -d '%')" >> "$CSV"
+          done
+          mdtable "$CSV" >> $GITHUB_STEP_SUMMARY
+
+      - uses: actions/upload-artifact@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          name: pdm-venv-stats
+          path: pdm_venv/stats.csv
+          retention-days: 10
+  
   pipenv:
     runs-on: ubuntu-20.04
     steps:
