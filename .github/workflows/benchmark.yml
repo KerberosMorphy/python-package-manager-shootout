@@ -148,7 +148,7 @@ jobs:
           mkdir -p "pdm-582"
           echo "tool,version,timestamp,stat,elapsed time,system,user,cpu percent,max rss,inputs,outputs" > "$CSV"
           for stat in "tooling" "import" "lock" "install-cold" "install-warm" "update" "add-package"; do
-            echo "pdm,$VERSION,$TIMESTAMP,$stat,$(cat timings/$stat.txt | tr -d '%')" >> "$CSV"
+            echo "pdm-582,$VERSION,$TIMESTAMP,$stat,$(cat timings/$stat.txt | tr -d '%')" >> "$CSV"
           done
           mdtable "$CSV" >> $GITHUB_STEP_SUMMARY
 
@@ -222,7 +222,7 @@ jobs:
           mkdir -p "pdm-venv"
           echo "tool,version,timestamp,stat,elapsed time,system,user,cpu percent,max rss,inputs,outputs" > "$CSV"
           for stat in "tooling" "import" "lock" "install-cold" "install-warm" "update" "add-package"; do
-            echo "pdm,$VERSION,$TIMESTAMP,$stat,$(cat timings/$stat.txt | tr -d '%')" >> "$CSV"
+            echo "pdm-venv,$VERSION,$TIMESTAMP,$stat,$(cat timings/$stat.txt | tr -d '%')" >> "$CSV"
           done
           mdtable "$CSV" >> $GITHUB_STEP_SUMMARY
 
