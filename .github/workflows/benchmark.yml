@@ -142,7 +142,7 @@ jobs:
 
       - name: stats
         run: |
-          VERSION=$(make pdm-version)
+          VERSION=$(make pdm-582-version)
           CSV=pdm-582/stats.csv
           TIMESTAMP=$(date +%s)
           mkdir -p "pdm-582"
@@ -216,7 +216,7 @@ jobs:
 
       - name: stats
         run: |
-          VERSION=$(make pdm-version)
+          VERSION=$(make pdm-venv-version)
           CSV=pdm-venv/stats.csv
           TIMESTAMP=$(date +%s)
           mkdir -p "pdm-venv"
