@@ -4,8 +4,13 @@
 name: benchmark
 on:
   workflow_dispatch:
-jobs:
+  
+env:
+  GL_USERNAME: ${{ secrets.GL_USERNAME }}
+  GLPAT_GOBBLET: ${{ secrets.GLPAT_GOBBLET }}
+  GLPAT_QUORIDOR: ${{ secrets.GLPAT_QUORIDOR }}
 
+jobs:
   poetry:
     runs-on: ubuntu-20.04
     steps:
