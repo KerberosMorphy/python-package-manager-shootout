@@ -4,11 +4,6 @@
 name: benchmark
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - benchmark/*
-  schedule:
-    - cron: '50 */6 * * *'
 jobs:
 
   poetry:
