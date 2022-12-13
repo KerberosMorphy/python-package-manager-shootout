@@ -57,7 +57,7 @@ poetry-stats:
 	done
 	mdtable "$CSV" >> $MD
 poetry-benchmark:
-    $(MAKE) docker-pre-benchmark
+    . ./bin/actions_prereqs.sh
     @time --output=timings/poetry/tooling.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) poetry-tooling
     @time --output=timings/poetry/import.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) poetry-import
     $(MAKE) poetry-clean-cache
@@ -105,7 +105,7 @@ pdm-582-stats:
     done
     mdtable "$CSV" >> $MD
 pdm-582-benchmark:
-    $(MAKE) docker-pre-benchmark
+    . ./bin/actions_prereqs.sh
     @time --output=timings/pdm-582/tooling.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pdm-582-tooling
     @time --output=timings/pdm-582/import.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pdm-582-import
     $(MAKE) pdm-582-clean-cache
@@ -154,7 +154,7 @@ pdm-venv-stats:
     done
     mdtable "$CSV" >> $MD
 pdm-venv-benchmark:
-    $(MAKE) docker-pre-benchmark
+    . ./bin/actions_prereqs.sh
     @time --output=timings/pdm-venv/tooling.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pdm-venv-tooling
     @time --output=timings/pdm-venv/import.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pdm-venv-import
     $(MAKE) pdm-venv-clean-cache
@@ -202,7 +202,7 @@ pipenv-stats:
     done
     mdtable "$CSV" >> $MD
 pipenv-benchmark:
-    $(MAKE) docker-pre-benchmark
+    . ./bin/actions_prereqs.sh
     @time --output=timings/pipenv/tooling.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pipenv-tooling
     @time --output=timings/pipenv/import.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pipenv-import
     $(MAKE) pipenv-clean-cache
@@ -254,7 +254,7 @@ pip-tools-stats:
     done
     mdtable "$CSV" >> $MD
 pip-tools-benchmark:
-    $(MAKE) docker-pre-benchmark
+    . ./bin/actions_prereqs.sh
     @time --output=timings/pip-tools/tooling.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pip-tools-tooling
     @time --output=timings/pip-tools/import.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pip-tools-import
     $(MAKE) pip-tools-clean-cache
@@ -266,6 +266,7 @@ pip-tools-benchmark:
     @time --output=timings/pip-tools/install-cold.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pip-tools-install
     $(MAKE) pip-tools-clean-venv
     @time --output=timings/pip-tools/install-warm.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pip-tools-install
+    $(MAKE) pip-tools-stats
 
 .PHONY: tools
 tools:
