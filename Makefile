@@ -17,18 +17,12 @@ PACKAGE := goodconf
 pip-clean:
 	rm -rf ~/.cache/pip
 
-.PHONY: docker-pre-benchmark
-docker-pre-benchmark:
-    docker build -t python-package-manager-shootout-main .
-    docker run python-package-manager-shootout-main
-    $(DOCKER_EXEC_CMD) "bin/actions_prereqs.sh"
-
 TOOLS := poetry
 .PHONY: poetry-tooling poetry-import poetry-clean-cache poetry-clean-venv poetry-clean-lock poetry-lock poetry-install poetry-add-package poetry-version poetry-benchmark poetry-stats
 poetry-tooling:
-	$(DOCKER_EXEC_CMD) "curl -sSL https://install.python-poetry.org | python3 -"
+	curl -sSL https://install.python-poetry.org | python3 -
 poetry-import:
-	$(DOCKER_EXEC_CMD) "cd poetry; poetry add $$(sed -e 's/#.*//' -e '/^$$/ d' < ../requirements.txt)"
+	cd poetry; poetry add $(cat < /app/requirements.txt)
 poetry-clean-cache: pip-clean
 	rm -rf ~/.cache/pypoetry
 poetry-clean-venv:
@@ -57,18 +51,16 @@ poetry-stats:
 	done
 	mdtable "$CSV" >> $MD
 poetry-benchmark:
-    . ./bin/actions_prereqs.sh
-    @time --output=timings/poetry/tooling.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) poetry-tooling
-    @time --output=timings/poetry/import.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) poetry-import
-    $(MAKE) poetry-clean-cache
-    $(MAKE) poetry-clean-venv
-    $(MAKE) poetry-clean-lock
-    @time --output=timings/poetry/lock.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) poetry-lock
-    $(MAKE) poetry-clean-cache
-    $(MAKE) poetry-clean-venv
-    @time --output=timings/poetry/install-cold.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) poetry-install
-    $(MAKE) poetry-clean-venv
-    @time --output=timings/poetry/install-warm.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) poetry-install
+	@/usr/bin/time --output=timings/poetry/tooling.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) poetry-tooling
+	$(MAKE) poetry-clean-cache
+	$(MAKE) poetry-clean-venv
+	$(MAKE) poetry-clean-lock
+	@/usr/bin/time --output=timings/poetry/lock.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) poetry-lock
+	$(MAKE) poetry-clean-cache
+	$(MAKE) poetry-clean-venv
+	@/usr/bin/time --output=timings/poetry/install-cold.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) poetry-install
+	$(MAKE) poetry-clean-venv
+	@/usr/bin/time --output=timings/poetry/install-warm.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) poetry-install
 
 TOOLS := "$(TOOLS) pdm-582"
 .PHONY: pdm-582-tooling pdm-582-import pdm-582-clean-cache pdm-582-clean-venv pdm-582-clean-lock pdm-582-lock pdm-582-install pdm-582-add-package pdm-582-version pdm-582-benchmark pdm-582-stats
@@ -95,29 +87,28 @@ pdm-582-version:
 	@pdm --version | awk '{print $$3}'
 
 pdm-582-stats:
-    VERSION=$($(MAKE) pdm-582-version)
-    CSV=timings/pdm-582/stats.csv
-    MD=timings/pdm-582/stats.md
-    TIMESTAMP=$(date +%s)
-    echo "tool,version,timestamp,stat,elapsed time,system,user,cpu percent,max rss,inputs,outputs" > "$CSV"
-    for stat in "tooling" "import" "lock" "install-cold" "install-warm" "update" "add-package"; do
-      echo "pdm-582,$VERSION,$TIMESTAMP,$stat,$(cat timings/pdm-582/$stat.txt | tr -d '%')" >> "$CSV"
-    done
-    mdtable "$CSV" >> $MD
+	VERSION=$($(MAKE) pdm-582-version)
+	CSV=timings/pdm-582/stats.csv
+	MD=timings/pdm-582/stats.md
+	TIMESTAMP=$(date +%s)
+	echo "tool,version,timestamp,stat,elapsed time,system,user,cpu percent,max rss,inputs,outputs" > "$CSV"
+	for stat in "tooling" "import" "lock" "install-cold" "install-warm" "update" "add-package"; do
+	  echo "pdm-582,$VERSION,$TIMESTAMP,$stat,$(cat timings/pdm-582/$stat.txt | tr -d '%')" >> "$CSV"
+	done
+	mdtable "$CSV" >> $MD
 pdm-582-benchmark:
-    . ./bin/actions_prereqs.sh
-    @time --output=timings/pdm-582/tooling.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pdm-582-tooling
-    @time --output=timings/pdm-582/import.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pdm-582-import
-    $(MAKE) pdm-582-clean-cache
-    $(MAKE) pdm-582-clean-venv
-    $(MAKE) pdm-582-clean-lock
-    @time --output=timings/pdm-582/lock.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pdm-582-lock
-    $(MAKE) pdm-582-clean-cache
-    $(MAKE) pdm-582-clean-venv
-    @time --output=timings/pdm-582/install-cold.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pdm-582-install
-    $(MAKE) pdm-582-clean-venv
-    @time --output=timings/pdm-582/install-warm.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pdm-582-install
-    $(MAKE) pdm-582-stats
+	@/usr/bin/time --output=timings/pdm-582/tooling.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pdm-582-tooling
+	@/usr/bin/time --output=timings/pdm-582/import.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pdm-582-import
+	$(MAKE) pdm-582-clean-cache
+	$(MAKE) pdm-582-clean-venv
+	$(MAKE) pdm-582-clean-lock
+	@/usr/bin/time --output=timings/pdm-582/lock.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pdm-582-lock
+	$(MAKE) pdm-582-clean-cache
+	$(MAKE) pdm-582-clean-venv
+	@/usr/bin/time --output=timings/pdm-582/install-cold.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pdm-582-install
+	$(MAKE) pdm-582-clean-venv
+	@/usr/bin/time --output=timings/pdm-582/install-warm.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pdm-582-install
+	$(MAKE) pdm-582-stats
 
 TOOLS := "$(TOOLS) pdm-venv"
 .PHONY: pdm-venv-tooling pdm-venv-import pdm-venv-clean-cache pdm-venv-clean-venv pdm-venv-clean-lock pdm-venv-lock pdm-venv-install pdm-venv-add-package pdm-venv-version pdm-venv-benchmark pdm-venv-stats
@@ -144,29 +135,27 @@ pdm-venv-version:
 	@pdm --version | awk '{print $$3}'
 
 pdm-venv-stats:
-    VERSION=$($(MAKE) pdm-venv-version)
-    CSV=timings/pdm-venv/stats.csv
-    MD=timings/pdm-venv/stats.md
-    TIMESTAMP=$(date +%s)
-    echo "tool,version,timestamp,stat,elapsed time,system,user,cpu percent,max rss,inputs,outputs" > "$CSV"
-    for stat in "tooling" "import" "lock" "install-cold" "install-warm" "update" "add-package"; do
-      echo "pdm-venv,$VERSION,$TIMESTAMP,$stat,$(cat timings/pdm-venv/$stat.txt | tr -d '%')" >> "$CSV"
-    done
-    mdtable "$CSV" >> $MD
+	VERSION=$($(MAKE) pdm-venv-version)
+	CSV=timings/pdm-venv/stats.csv
+	MD=timings/pdm-venv/stats.md
+	TIMESTAMP=$(date +%s)
+	echo "tool,version,timestamp,stat,elapsed time,system,user,cpu percent,max rss,inputs,outputs" > "$CSV"
+	for stat in "tooling" "lock" "install-cold" "install-warm"; do
+	  echo "pdm-venv,$VERSION,$TIMESTAMP,$stat,$(cat timings/pdm-venv/$stat.txt | tr -d '%')" >> "$CSV"
+	done
+	mdtable "$CSV" >> $MD
 pdm-venv-benchmark:
-    . ./bin/actions_prereqs.sh
-    @time --output=timings/pdm-venv/tooling.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pdm-venv-tooling
-    @time --output=timings/pdm-venv/import.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pdm-venv-import
-    $(MAKE) pdm-venv-clean-cache
-    $(MAKE) pdm-venv-clean-venv
-    $(MAKE) pdm-venv-clean-lock
-    @time --output=timings/pdm-venv/lock.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pdm-venv-lock
-    $(MAKE) pdm-venv-clean-cache
-    $(MAKE) pdm-venv-clean-venv
-    @time --output=timings/pdm-venv/install-cold.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pdm-venv-install
-    $(MAKE) pdm-venv-clean-venv
-    @time --output=timings/pdm-venv/install-warm.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pdm-venv-install
-    $(MAKE) pdm-venv-stats
+	@/usr/bin/time --output=timings/pdm-venv/tooling.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pdm-venv-tooling
+	$(MAKE) pdm-venv-clean-cache
+	$(MAKE) pdm-venv-clean-venv
+	$(MAKE) pdm-venv-clean-lock
+	@/usr/bin/time --output=timings/pdm-venv/lock.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pdm-venv-lock
+	$(MAKE) pdm-venv-clean-cache
+	$(MAKE) pdm-venv-clean-venv
+	@/usr/bin/time --output=timings/pdm-venv/install-cold.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pdm-venv-install
+	$(MAKE) pdm-venv-clean-venv
+	@/usr/bin/time --output=timings/pdm-venv/install-warm.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pdm-venv-install
+	$(MAKE) pdm-venv-stats
 
 TOOLS := "$(TOOLS) pipenv"
 .PHONY: pipenv-tooling pipenv-import pipenv-clean-cache pipenv-clean-venv pipenv-clean-lock pipenv-lock pipenv-install pipenv-add-package pipenv-version pipenv-benchmark pipenv-stats
@@ -192,29 +181,28 @@ pipenv-version:
 	@pipenv --version | awk '{print $$3}'
 
 pipenv-stats:
-    VERSION=$($(MAKE) pipenv-version)
-    CSV=timings/pipenv/stats.csv
-    MD=timings/pipenv/stats.md
-    TIMESTAMP=$(date +%s)
-    echo "tool,version,timestamp,stat,elapsed time,system,user,cpu percent,max rss,inputs,outputs" > "$CSV"
-    for stat in "tooling" "import" "lock" "install-cold" "install-warm" "update" "add-package"; do
-      echo "pipenv,$VERSION,$TIMESTAMP,$stat,$(cat timings/pipenv/$stat.txt | tr -d '%')" >> "$CSV"
-    done
-    mdtable "$CSV" >> $MD
+	VERSION=$($(MAKE) pipenv-version)
+	CSV=timings/pipenv/stats.csv
+	MD=timings/pipenv/stats.md
+	TIMESTAMP=$(date +%s)
+	echo "tool,version,timestamp,stat,elapsed time,system,user,cpu percent,max rss,inputs,outputs" > "$CSV"
+	for stat in "tooling" "import" "lock" "install-cold" "install-warm" "update" "add-package"; do
+	  echo "pipenv,$VERSION,$TIMESTAMP,$stat,$(cat timings/pipenv/$stat.txt | tr -d '%')" >> "$CSV"
+	done
+	mdtable "$CSV" >> $MD
 pipenv-benchmark:
-    . ./bin/actions_prereqs.sh
-    @time --output=timings/pipenv/tooling.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pipenv-tooling
-    @time --output=timings/pipenv/import.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pipenv-import
-    $(MAKE) pipenv-clean-cache
-    $(MAKE) pipenv-clean-venv
-    $(MAKE) pipenv-clean-lock
-    @time --output=timings/pipenv/lock.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pipenv-lock
-    $(MAKE) pipenv-clean-cache
-    $(MAKE) pipenv-clean-venv
-    @time --output=timings/pipenv/install-cold.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pipenv-install
-    $(MAKE) pipenv-clean-venv
-    @time --output=timings/pipenv/install-warm.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pipenv-install
-    $(MAKE) pipenv-stats
+	@/usr/bin/time --output=timings/pipenv/tooling.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pipenv-tooling
+	@/usr/bin/time --output=timings/pipenv/import.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pipenv-import
+	$(MAKE) pipenv-clean-cache
+	$(MAKE) pipenv-clean-venv
+	$(MAKE) pipenv-clean-lock
+	@/usr/bin/time --output=timings/pipenv/lock.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pipenv-lock
+	$(MAKE) pipenv-clean-cache
+	$(MAKE) pipenv-clean-venv
+	@/usr/bin/time --output=timings/pipenv/install-cold.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pipenv-install
+	$(MAKE) pipenv-clean-venv
+	@/usr/bin/time --output=timings/pipenv/install-warm.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pipenv-install
+	$(MAKE) pipenv-stats
 
 TOOLS := "$(TOOLS) pip-tools"
 .PHONY: pip-tools-tooling pip-tools-import pip-tools-clean-cache pip-tools-clean-venv pip-tools-clean-lock pip-tools-lock pip-tools-install pip-tools-add-package pip-tools-version pip-tools-benchmark pip-tools-stats
@@ -244,29 +232,28 @@ pip-tools-version:
 	@pip-compile --version | awk '{print $$3}'
 
 pip-tools-stats:
-    VERSION=$($(MAKE) pip-tools-version)
-    CSV=timings/pip-tools/stats.csv
-    MD=timings/pip-tools/stats.md
-    TIMESTAMP=$(date +%s)
-    echo "tool,version,timestamp,stat,elapsed time,system,user,cpu percent,max rss,inputs,outputs" > "$CSV"
-    for stat in "tooling" "import" "lock" "install-cold" "install-warm" "update" "add-package"; do
-      echo "pip-tools,$VERSION,$TIMESTAMP,$stat,$(cat timings/pip-tools/$stat.txt | tr -d '%')" >> "$CSV"
-    done
-    mdtable "$CSV" >> $MD
+	VERSION=$($(MAKE) pip-tools-version)
+	CSV=timings/pip-tools/stats.csv
+	MD=timings/pip-tools/stats.md
+	TIMESTAMP=$(date +%s)
+	echo "tool,version,timestamp,stat,elapsed time,system,user,cpu percent,max rss,inputs,outputs" > "$CSV"
+	for stat in "tooling" "import" "lock" "install-cold" "install-warm" "update" "add-package"; do
+	  echo "pip-tools,$VERSION,$TIMESTAMP,$stat,$(cat timings/pip-tools/$stat.txt | tr -d '%')" >> "$CSV"
+	done
+	mdtable "$CSV" >> $MD
 pip-tools-benchmark:
-    . ./bin/actions_prereqs.sh
-    @time --output=timings/pip-tools/tooling.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pip-tools-tooling
-    @time --output=timings/pip-tools/import.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pip-tools-import
-    $(MAKE) pip-tools-clean-cache
-    $(MAKE) pip-tools-clean-venv
-    $(MAKE) pip-tools-clean-lock
-    @time --output=timings/pip-tools/lock.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pip-tools-lock
-    $(MAKE) pip-tools-clean-cache
-    $(MAKE) pip-tools-clean-venv
-    @time --output=timings/pip-tools/install-cold.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pip-tools-install
-    $(MAKE) pip-tools-clean-venv
-    @time --output=timings/pip-tools/install-warm.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pip-tools-install
-    $(MAKE) pip-tools-stats
+	@/usr/bin/time --output=timings/pip-tools/tooling.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pip-tools-tooling
+	@/usr/bin/time --output=timings/pip-tools/import.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pip-tools-import
+	$(MAKE) pip-tools-clean-cache
+	$(MAKE) pip-tools-clean-venv
+	$(MAKE) pip-tools-clean-lock
+	@/usr/bin/time --output=timings/pip-tools/lock.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pip-tools-lock
+	$(MAKE) pip-tools-clean-cache
+	$(MAKE) pip-tools-clean-venv
+	@/usr/bin/time --output=timings/pip-tools/install-cold.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pip-tools-install
+	$(MAKE) pip-tools-clean-venv
+	@/usr/bin/time --output=timings/pip-tools/install-warm.txt --format="%e,%S,%U,%P,%M,%I,%O" $(MAKE) pip-tools-install
+	$(MAKE) pip-tools-stats
 
 .PHONY: tools
 tools:

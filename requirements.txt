@@ -11,7 +11,7 @@ django-tinymce==3.4.0
 django-redis==5.2.0
 djangorestframework==3.13.1
 djangorestframework-dataclasses==1.1.1
-dvc[S3]==2.10.2
+dvc[s3]==2.10.2
 factory-boy==3.2.1
 flower==1.2.0
 gunicorn==20.1.0

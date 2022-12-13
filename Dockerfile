@@ -12,9 +12,19 @@ RUN apt-get update -y -q && \
     git \
     build-essential \
     time \
+    curl \
+    make \
+    libxmlsec1-dev \
+    librdkafka-dev \
     && rm -rf /var/lib/apt/lists/*
 
+RUN pip --disable-pip-version-check --no-cache-dir install mdtable setuptools wheel
+
+ENV PATH="${PATH}:/root/.local/bin"
+
 COPY . /app
+
+WORKDIR /app
 
 FROM base as poetry
 
