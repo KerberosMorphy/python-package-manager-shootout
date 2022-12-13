@@ -70,6 +70,7 @@ pdm-venv-clean-cache: pip-clean
 	rm -rf ~/.cache/pdm
 pdm-venv-clean-venv:
 	rm -rf pdm/__pypackages__
+	cd pdm; pdm venv purge
 pdm-venv-clean-lock:
 	rm -f pdm/pdm.lock
 pdm-venv-lock:
