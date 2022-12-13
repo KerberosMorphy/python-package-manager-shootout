@@ -37,5 +37,5 @@ PyYAML==6.0
 radon==5.1.0
 requests==2.27.1
 sentry-sdk==0.19.1
-git+https://${GL_USERNAME}:${GLPAT_GOBBLET}@gitlab.fsg.ulaval.ca/atn/gobblet.git@v22.11.9
-git+https://${GL_USERNAME}:${GLPAT_QUORIDOR}@gitlab.fsg.ulaval.ca/atn/quoridor.git@v22.11.25.1
+git+https://${GL_USERNAME}:${GLPAT_GOBBLET}@gitlab.fsg.ulaval.ca/atn/gobblet.git@v22.11.9#egg=gobblet
+git+https://${GL_USERNAME}:${GLPAT_QUORIDOR}@gitlab.fsg.ulaval.ca/atn/quoridor.git@v22.11.25.1#egg=quoridor
